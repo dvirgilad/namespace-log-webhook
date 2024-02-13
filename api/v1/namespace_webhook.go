@@ -17,50 +17,24 @@ limitations under the License.
 package v1
 
 import (
-	"k8s.io/apimachinery/pkg/runtime"
-	ctrl "sigs.k8s.io/controller-runtime"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"context"
+
+	"github.com/sirupsen/logrus"
+	"go.elastic.co/ecslogrus"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
-// log is for logging in this package.
-var namespacelog = logf.Log.WithName("namespace-resource")
+//+kubebuilder:webhook:path=/validate-core-v1-namespace,mutating=false,failurePolicy=fail,sideEffects=None,groups=core,resources=namespaces,verbs=create;update;delete,versions=v1,name=vnamespace.kb.io,admissionReviewVersions=v1
 
-// SetupWebhookWithManager will setup the manager to manage the webhooks
-func (r *Namespace) SetupWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(r).
-		Complete()
+type NamespaceValidator struct {
+	Client client.Client
 }
 
-// TODO(user): EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
+func (v *NamespaceValidator) Handle(ctx context.Context, req admission.Request) admission.Response {
+	log := logrus.New()
+	log.SetFormatter(&ecslogrus.Formatter{})
 
-// TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
-//+kubebuilder:webhook:path=/validate-core-v1-namespace,mutating=false,failurePolicy=fail,sideEffects=None,groups=core,resources=namespaces,verbs=create;update,versions=v1,name=vnamespace.kb.io,admissionReviewVersions=v1
-
-var _ webhook.Validator = &Namespace{}
-
-// ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *Namespace) ValidateCreate() (admission.Warnings, error) {
-	namespacelog.Info("validate create", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object creation.
-	return nil, nil
-}
-
-// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *Namespace) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
-	namespacelog.Info("validate update", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object update.
-	return nil, nil
-}
-
-// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *Namespace) ValidateDelete() (admission.Warnings, error) {
-	namespacelog.Info("validate delete", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object deletion.
-	return nil, nil
+	log.WithField("namespace", req.Namespace).WithField("user", req.UserInfo.Username).WithField("action", req.Operation).Info("namespace action")
+	return admission.Allowed("logged action")
 }

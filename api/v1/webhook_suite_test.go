@@ -87,8 +87,8 @@ var _ = BeforeSuite(func() {
 	Expect(cfg).NotTo(BeNil())
 
 	scheme := apimachineryruntime.NewScheme()
-	err = AddToScheme(scheme)
-	Expect(err).NotTo(HaveOccurred())
+	//err = AddToScheme(scheme)
+	//Expect(err).NotTo(HaveOccurred())
 
 	err = admissionv1.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())
@@ -113,8 +113,8 @@ var _ = BeforeSuite(func() {
 	})
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&Namespace{}).SetupWebhookWithManager(mgr)
-	Expect(err).NotTo(HaveOccurred())
+	//err = (&Namespace{}).SetupWebhookWithManager(mgr)
+	//Expect(err).NotTo(HaveOccurred())
 
 	//+kubebuilder:scaffold:webhook
 
